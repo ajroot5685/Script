@@ -1,0 +1,26 @@
+services:
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    restart: always
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: <관리자계졍>
+      MONGO_INITDB_ROOT_PASSWORD: <비밀번호>
+    entrypoint: [ "/bin/bash", "-c", "
+          chown -R mongodb:mongodb /data/mongodb /var/log/mongodb &&
+          mkdir -p /var/log/mongodb &&
+          touch /var/log/mongodb/access.log &&
+          exec docker-entrypoint.sh mongod --config /etc/mongo/mongod.conf
+        " ]
+    volumes:
+      - /etc/mongo/mongod.conf:/etc/mongo/mongod.conf # 설정 파일 마운트
+      - /data/mongodb:/data/mongodb # 데이터 마운트
+      - /var/log/mongodb:/var/log/mongodb # 로그 마운트
+    networks:
+      - <네트워크 이름>
+
+networks:
+  <네트워크 이름>:
+    external: true
