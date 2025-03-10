@@ -58,6 +58,12 @@ check_docker() {
     docker-compose --version
 }
 
+setting_permission() {
+    echo "👷 권한 설정..."
+    sudo usermod -aG docker $USER
+    sudo newgrp docker
+}
+
 # 실행 순서
 install_docker
 start_docker
@@ -65,5 +71,3 @@ install_docker_compose
 check_docker
 
 echo "🎉 Docker 및 Docker Compose 설치 및 설정이 완료되었습니다!"
-
-# 이후 docker 권한 설정 필요
