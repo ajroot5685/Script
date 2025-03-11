@@ -1,9 +1,6 @@
 [도커 컨테이너의 몽고 쉘 접속]
 docker exec -it mongodb mongosh -u <유저이름> -p <비밀번호>
 
-docker exec -it mongodb mongosh -u jg -p 1mongo
-
-
 [DB 생성]
 use db
 
