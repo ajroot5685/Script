@@ -1,0 +1,22 @@
+[클라이언트 인증서 검증을 위한 CA 생성]
+sudo openssl genpkey -algorithm RSA -out mongoCA.key
+sudo openssl req -new -x509 -key mongoCA.key -days 3650 -out mongoCA.crt
+
+[클라이언트 인증서 생성 및 CA 서명]
+sudo openssl genpkey -algorithm RSA -out client.key
+sudo openssl req -new -key client.key -out client.csr
+sudo openssl x509 -req -in client.csr -CA mongoCA.crt -CAkey mongoCA.key -CAcreateserial -days 1825 -out client.crt
+sudo cat client.key client.crt | sudo tee client.pem > /dev/null
+
+[mongod.conf 설정 추가]
+net:
+  tls:
+    mode: allowTLS
+    certificateKeyFile: /etc/mongo/mongoCA.pem
+    CAFile: /etc/mongo/mongoCA.crt
+
+[docker로 띄운 경우 호스트의 파일과 마운트(docker-compose)]
+    volumes:
+      - /etc/mongo/mongod.conf:/etc/mongo/mongod.conf # 설정 파일 마운트
+      - /etc/mongo/ssl/mongoCA.pem:/etc/mongo/mongoCA.pem # TLS 서버 인증파일
+      - /etc/mongo/ssl/mongoCA.crt:/etc/mongo/mongoCA.crt # 클라이언트 인증서 검증할 CA 파일

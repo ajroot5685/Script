@@ -16,6 +16,8 @@ services:
         " ]
     volumes:
       - /etc/mongo/mongod.conf:/etc/mongo/mongod.conf # 설정 파일 마운트
+      - /etc/mongo/ssl/mongoCA.pem:/etc/mongo/mongoCA.pem # TLS 서버 인증파일
+      - /etc/mongo/ssl/mongoCA.crt:/etc/mongo/mongoCA.crt # 클라이언트 인증서 검증할 CA 파일
       - /data/mongodb:/data/mongodb # 데이터 마운트
       - /var/log/mongodb:/var/log/mongodb # 로그 마운트
     networks:
