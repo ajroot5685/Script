@@ -17,20 +17,32 @@ if [[ "$DOMAIN" == *".example.com" ]]; then
     exit 1
 fi
 
+# SSL 인증 선행 필요
+if ! sudo find /etc/letsencrypt/live -maxdepth 1 -name "$DOMAIN" | grep -q .; then
+    echo "❌ $DOMAIN에 대한 SSL 인증이 필요합니다."
+    exit 1
+fi
+
 echo "🚀 Nginx 설정 생성 중: $DOMAIN"
 
 # 사이트 설정 파일 생성
 sudo tee $NGINX_AVAILABLE > /dev/null <<EOL
 server {
-    listen 80;
+    listen 443 ssl;
     server_name $DOMAIN;
 
     root $WEB_ROOT;
     index index.html;
 
     location / {
-        try_files \$uri \$uri/ =404;
+        proxy_pass http://localhost:<port>;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
     }
+
+    ssl_certificate /etc/letsencrypt/live/$DOMAIN/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/$DOMAIN/privkey.pem;
 
     include /etc/nginx/global_security.conf;
 }
@@ -54,7 +66,7 @@ fi
 # Nginx 설정 테스트 및 재시작
 if sudo nginx -t; then
     sudo systemctl restart nginx
-    echo "🎉 $DOMAIN 설정 완료! 이제 http://$DOMAIN 에서 확인하세요."
+    echo "🎉 $DOMAIN 설정 완료! 이제 https://$DOMAIN 에서 확인하세요."
 else
     echo "❌ Nginx 설정 테스트 실패, Nginx 설정을 확인하세요."
     exit 1

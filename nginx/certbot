@@ -1,0 +1,12 @@
+[certbot 설치]
+sudo snap install core
+sudo snap install --classic certbot
+
+[심볼릭 링크 연결]
+sudo ln -s /snap/bin/certbot /usr/bin/certbot
+
+[인증 시도]
+sudo certbot certonly --webroot -w /var/www/certbot -d example.org
+
+[crontab 자동 갱신]
+0 3 * * 0 /opt/certbot/certbot_renew.sh
