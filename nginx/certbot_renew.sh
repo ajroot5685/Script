@@ -25,7 +25,9 @@ fi
 echo "[$(date)] Starting certbot renew process..." >> "$LOGFILE"
 
 # Certbot 갱신
+sudo ufw allow 80
 sudo certbot renew >> "$LOGFILE" 2>&1
+sudo ufw delete allow 80
 
 if ! "$DISABLE_SITE_SCRIPT_PATH" "$SITE_NAME"; then
     exit 1
