@@ -11,16 +11,16 @@ fi
 
 echo "✅ 현재 OS: $OS"
 
-# Nginx 설치
+# Nginx 설치 (stream 모듈 포함)
 install_nginx() {
     echo "🚀 Nginx 설치 시작..."
 
     if [[ "$OS" == "ubuntu" || "$OS" == "debian" ]]; then
         sudo apt update -y
-        sudo apt install nginx -y
+        sudo apt install nginx-full -y  # stream 모듈 포함된 패키지 설치
     elif [[ "$OS" == "centos" || "$OS" == "rhel" ]]; then
         sudo yum install epel-release -y
-        sudo yum install nginx -y
+        sudo yum install nginx nginx-mod-stream -y  # stream 모듈 포함된 패키지 설치
     else
         echo "❌ 지원되지 않는 OS입니다."
         exit 1
