@@ -1,0 +1,35 @@
+services:
+  node-exporter:
+    image: prom/node-exporter:latest
+    container_name: node-exporter
+    restart: unless-stopped
+    ports:
+      - "9100:9100"
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.sysfs=/host/sys'
+      - '--path.rootfs=/rootfs'
+      - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
+    networks:
+      - monitoring
+
+  nginx-exporter:
+    image: nginx/nginx-prometheus-exporter:latest
+    container_name: nginx-exporter
+    restart: unless-stopped
+    ports:
+      - "9113:9113"
+    extra_hosts:
+      - "local:172.xx.0.1" # monitoring 네트워크의 게이트웨이 IP
+    command:
+      - '-nginx.scrape-uri=http://local:81/nginx_status' # 81 포트 방화벽 허용 및 nginx 실행할 것
+    networks:
+      - monitoring
+
+networks:
+  monitoring:
+    external: true
