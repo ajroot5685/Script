@@ -1,0 +1,23 @@
+services:
+  controller:
+    image: ngrinder/controller:3.5.9-p1
+    container_name: ngrinder-controller
+    ports:
+      - "8080:80"          # 웹 UI
+      - "16001:16001"      # Agent 연결
+      - "12000-12029:12000-12029"  # 스트레스 테스트 할당 포트
+    volumes:
+      - /tmp/ngrinder-controller:/opt/ngrinder-controller # /c 경로 오류 존재
+    environment:
+      - TZ=Asia/Seoul
+
+  agent:
+    image: ngrinder/agent:3.5.9-p1
+    container_name: ngrinder-agent
+    command: controller:80   # controller의 서비스 이름과 포트 지정
+    volumes:
+      - /tmp/ngrinder-agent:/opt/ngrinder-agent # /c 경로 오류 존재
+    depends_on:
+      - controller
+    environment:
+      - TZ=Asia/Seoul
